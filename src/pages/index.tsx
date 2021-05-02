@@ -8,23 +8,22 @@ import Nav from 'react-bootstrap/Nav'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
-import Table from 'react-bootstrap/Table'
 import Modal from 'react-bootstrap/Modal'
 import Toast from 'react-bootstrap/Toast'
-import Moment from 'react-moment'
 import Navbar from 'react-bootstrap/Navbar'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 
+import { ProductList } from '../components/Products/List'
+
 /**
  * Services.
  */
 import {
-  save,
+  // save,
   findAll,
-  PouchProduct,
-  PouchAllProducts,
+  Product,
   subscribeToChanges
 } from '../services/products'
 
@@ -40,10 +39,10 @@ export default function Home() {
   const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [showErrorToast, setShowErrorToast] = useState(false)
 
-  const [product, setProduct] = useState<PouchProduct>()
-  const [products, setProducts] = useState<PouchAllProducts>()
+  const [product, setProduct] = useState<Product>()
+  const [products, setProducts] = useState<Product[]>()
   const [productName, setProductName] = useState('')
-  
+
   /**
    * Functions.
    */
@@ -52,10 +51,10 @@ export default function Home() {
     setProducts(products)
   }
 
-  const handlePressToEdit = (doc: PouchProduct) => {
-    setProduct(doc)
-    setShowModal(true)
-  }
+  // const handlePressToEdit = (doc: PouchProduct) => {
+  //   setProduct(doc)
+  //   setShowModal(true)
+  // }
 
   const onFieldChanges = (value: string) => {
     setProductName(value)
@@ -74,14 +73,15 @@ export default function Home() {
     if(!product || !productName) return
 
     try {
-      const { id: _id, doc } = product
+      // const { id: _id, doc } = product
 
-      await save({
-        _id,
-        _rev: doc._rev,
-        ...doc,
-        description: productName
-      })
+      // await save({
+      //   _id,
+      //   _rev: doc._rev,
+      //   ...doc,
+      //   description: productName,
+      //   updatedAt: new Date().toISOString()
+      // })
 
       setShowSuccessToast(true)
     } catch {
@@ -105,11 +105,11 @@ export default function Home() {
     }).on('change', getAllProducts)
   }, [])
 
-  useEffect(function () {
-    if (!product) return
+  // useEffect(function () {
+  //   if (!product) return
 
-    setProductName(product?.doc?.description)
-  }, [product])
+  //   setProductName(product?.doc?.description)
+  // }, [product])
 
   /**
    * JSX.
@@ -205,45 +205,10 @@ export default function Home() {
         <Container>
           <Row>
             <Col>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Referência</th>
-                    <th>Produto</th>
-                    <th>Atualizado em</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {
-                    !products ? (
-                      <tr>
-                        <td colSpan={4}>
-                          <span>Aguarde, buscando produtos.</span>
-                        </td>
-                      </tr>
-                    ) : products?.rows.map(product => (
-                      <tr key={`product-${product.id}`}>
-                        <td>{product.doc.code}</td>
-                        <td>
-                          <Button
-                            variant="link"
-                            onClick={() => handlePressToEdit(product)}
-                          >
-                            {product.doc.description}
-                          </Button>
-                        </td>
-                        <td>
-                          <Moment
-                            date={product.doc.updatedAt}
-                            format="DD/MM/YY hh:mm:ss"
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </Table>
+              <ProductList
+                isLoading={!products}
+                products={products}
+              />
             </Col>
           </Row>
         </Container>

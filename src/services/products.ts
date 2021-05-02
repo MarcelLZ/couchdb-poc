@@ -3,25 +3,17 @@ import { db } from './db'
 /**
  * Types.
  */
-type Product = {
-  id: string
+export type Product = {
+  _id: string
+  _rev?: string
+
+  FWId: string
   description: string
   code: string
   isVisible: boolean
   isAvailable: boolean
   currentInventory: number
   updatedAt: string
-}
-
-export type PouchAllProducts = PouchDB.Core.AllDocsResponse<Product>
-export type PouchProduct = {
-  doc?: PouchDB.Core.ExistingDocument<Product & PouchDB.Core.AllDocsMeta>;
-  id: string;
-  key: string;
-  value: {
-      rev: string;
-      deleted?: boolean;
-  };
 }
 
 /**
@@ -39,13 +31,26 @@ export const save = (product: PouchDB.Core.PutDocument<Product>) => {
   }
 }
 
-export const findAll = () => {
+export const findAll = async () => {
   try {
-    return db.allDocs<Product>({
+    const foundProducts = await db.allDocs<Product>({
       include_docs: true,
       startkey: 'products',
       endkey: 'products\ufff0'
     })
+
+    return foundProducts.rows.map(({ id: FWId, doc }) => ({
+      _id: doc._id,
+      _rev: doc._rev,
+
+      FWId,
+      description: doc.description,
+      code: doc.code,
+      isVisible: doc.isVisible,
+      isAvailable: doc.isAvailable,
+      currentInventory: doc.currentInventory,
+      updatedAt: doc.updatedAt
+    }))
   } catch {
     console.error('Erro ao buscar os produtos.')
   }
