@@ -1,27 +1,33 @@
-import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import { useEffect, useState } from 'react'
 
 /**
  * Components.
  */
-import Moment from 'react-moment'
-import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import Jumbotron from 'react-bootstrap/Jumbotron'
-import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
 import Table from 'react-bootstrap/Table'
 import Modal from 'react-bootstrap/Modal'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
 import Toast from 'react-bootstrap/Toast'
+import Moment from 'react-moment'
+import Navbar from 'react-bootstrap/Navbar'
+import Button from 'react-bootstrap/Button'
+import Container from 'react-bootstrap/Container'
+import Jumbotron from 'react-bootstrap/Jumbotron'
 
 /**
  * Services.
  */
 import { db } from '../services/db'
-import { findAll as findAllProducts, PouchAllProducts, PouchProduct } from '../services/products'
+import {
+  save,
+  findAll,
+  PouchProduct,
+  PouchAllProducts,
+  subscribeToChanges
+} from '../services/products'
 
 
 /**
@@ -43,7 +49,7 @@ export default function Home() {
    * Functions.
    */
   const getAllProducts = async () => {
-    const products = await findAllProducts()
+    const products = await findAll()
     setProducts(products)
   }
 
@@ -69,10 +75,10 @@ export default function Home() {
     if(!product || !productName) return
 
     try {
-      const { id, doc } = product
+      const { id: _id, doc } = product
 
-      await db.put({
-        _id: id,
+      await save({
+        _id,
         _rev: doc._rev,
         ...doc,
         description: productName
@@ -91,8 +97,10 @@ export default function Home() {
    */
   useEffect(function () {
     getAllProducts()
+  }, [])
 
-    db.changes({
+  useEffect(function () {
+    subscribeToChanges({
       since: 'now',
       live: true
     }).on('change', getAllProducts)

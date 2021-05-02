@@ -27,6 +27,18 @@ export type PouchProduct = {
 /**
  * Functions.
  */
+export const subscribeToChanges = (options: PouchDB.Core.ChangesOptions) => {
+  return db.changes(options)
+}
+
+export const save = (product: PouchDB.Core.PutDocument<Product>) => {
+  try {
+    return db.put(product)
+  } catch {
+    console.error('Erro ao atualizar o produto.')
+  }
+}
+
 export const findAll = () => {
   try {
     return db.allDocs<Product>({
@@ -35,20 +47,6 @@ export const findAll = () => {
       endkey: 'products\ufff0'
     })
   } catch {
-    console.log('Erro ao buscar os produtos.')
-  }
-}
-
-export const findOne = async () => {
-  try {
-    const t = await db.allDocs<Product>({
-      include_docs: true,
-      startkey: 'products',
-      endkey: 'products\ufff0'
-    })
-
-    return t.rows[0]
-  } catch {
-    console.log('Erro ao buscar os produtos.')
+    console.error('Erro ao buscar os produtos.')
   }
 }
