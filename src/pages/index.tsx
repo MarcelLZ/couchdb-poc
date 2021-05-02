@@ -20,7 +20,6 @@ import Jumbotron from 'react-bootstrap/Jumbotron'
 /**
  * Services.
  */
-import { db } from '../services/db'
 import {
   save,
   findAll,
