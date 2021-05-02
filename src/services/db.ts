@@ -4,8 +4,8 @@ import PouchDB from 'pouchdb'
  * Configurations.
  */
 const LOCAL_DB = 'homolog'
-const COUCHDB_URL = 'ec2-18-222-48-29.us-east-2.compute.amazonaws.com'
-const REMOTE_DB = `http://admin:couchdb@${COUCHDB_URL}/${LOCAL_DB}`
+const COUCHDB_URL = 'couchdb.fw7services.net'
+const REMOTE_DB = `https://admin:couchdb@${COUCHDB_URL}/${LOCAL_DB}`
 
 /**
  * Instanciating dbs.
